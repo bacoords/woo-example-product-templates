@@ -182,13 +182,7 @@ function get_product_category_template_slugs( int $product_id ): array {
  * @return string[]
  */
 function get_template_category_slugs(): array {
-	return array_values(
-		array_unique(
-			array_filter(
-				array_map( 'sanitize_title', CATEGORY_SLUGS )
-			)
-		)
-	);
+	return CATEGORY_SLUGS;
 }
 
 /**

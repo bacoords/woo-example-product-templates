@@ -21,10 +21,10 @@ If a product belongs to the `music` category, WordPress checks that category tem
 
 ## Configure categories
 
-Edit `Product_Category_Templates::CATEGORY_SLUGS` in `woo-example-product-templates.php`:
+Edit `CATEGORY_SLUGS` in `woo-example-product-templates.php`:
 
 ```php
-private const CATEGORY_SLUGS = array(
+const CATEGORY_SLUGS = array(
 	'clothing',
 	'decor',
 	'music',

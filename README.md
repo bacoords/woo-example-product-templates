@@ -4,6 +4,8 @@ Example WooCommerce plugin that registers category-specific block templates for 
 
 This is meant as tutorial code, not a complete template-management product. It keeps the configuration in PHP so developers can see the moving parts clearly.
 
+<img width="3508" height="2382" alt="SCR-20260707-petb" src="https://github.com/user-attachments/assets/84064ba2-f710-49db-8224-0df1a2b9b891" />
+
 ## What it does
 
 - Registers one single product block template per configured product category slug.

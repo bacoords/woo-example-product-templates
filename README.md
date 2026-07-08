@@ -33,7 +33,7 @@ const CATEGORY_SLUGS = array(
 );
 ```
 
-Use top-level product category slugs from your site. Products assigned to child categories can route through a configured ancestor category. For example, a product in `tshirts` can use the `clothing` template if `clothing` is listed.
+Use exact top-level product category slugs from your site. Products assigned to child categories can route through a configured ancestor category. For example, a product in `tshirts` can use the `clothing` template if `clothing` is listed.
 
 ## Template behavior
 

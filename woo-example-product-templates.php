@@ -23,7 +23,7 @@ const TEMPLATE_SLUG_PREFIX = 'single-product-category-';
 /**
  * Product category slugs used by this example.
  *
- * Change this list to match the top-level product categories on your site.
+ * Change this list to match exact top-level product category slugs on your site.
  */
 const CATEGORY_SLUGS = array(
 	'clothing',
@@ -38,14 +38,15 @@ add_filter( 'single_template_hierarchy', __NAMESPACE__ . '\add_category_template
  * Register the category-routed product block templates.
  */
 function register_product_templates(): void {
-	if ( ! function_exists( 'register_block_template' ) || ! class_exists( '\WP_Block_Templates_Registry' ) ) {
+	if ( ! function_exists( 'register_block_template' ) ) {
 		return;
 	}
 
 	$registry         = \WP_Block_Templates_Registry::get_instance();
 	$template_content = get_single_product_template_content();
 
-	foreach ( get_template_category_slugs() as $category_slug ) {
+	foreach ( CATEGORY_SLUGS as $category_slug ) {
+		$category_label = ucwords( str_replace( '-', ' ', $category_slug ) );
 		$template_slug = get_template_slug( $category_slug );
 		$template_name = TEMPLATE_NAMESPACE . '//' . $template_slug;
 
@@ -56,11 +57,15 @@ function register_product_templates(): void {
 		register_block_template(
 			$template_name,
 			array(
-				'title'       => get_template_title( $category_slug ),
+				'title'       => sprintf(
+					/* translators: %s: Product category name. */
+					__( 'Single Product: %s Category', 'woo-example-product-templates' ),
+					$category_label
+				),
 				'description' => sprintf(
 					/* translators: %s: Product category name. */
 					__( 'Displays single products in the %s category.', 'woo-example-product-templates' ),
-					get_category_label( $category_slug )
+					$category_label
 				),
 				'content'     => $template_content,
 				'post_types'  => array( 'product' ),
@@ -164,43 +169,15 @@ function get_product_category_template_slugs( int $product_id ): array {
 		return array();
 	}
 
-	$category_slugs = get_template_category_slugs();
 	$direct_slugs   = wp_list_pluck( $terms, 'slug' );
-	$matched_slugs  = filter_configured_category_slugs( $direct_slugs, $category_slugs );
+	$matched_slugs  = array_values( array_intersect( CATEGORY_SLUGS, $direct_slugs ) );
 
 	if ( array() === $matched_slugs ) {
 		$ancestor_slugs = get_product_category_ancestor_slugs( $terms );
-		$matched_slugs  = filter_configured_category_slugs( $ancestor_slugs, $category_slugs );
+		$matched_slugs  = array_values( array_intersect( CATEGORY_SLUGS, $ancestor_slugs ) );
 	}
 
 	return array_map( __NAMESPACE__ . '\get_template_slug', $matched_slugs );
-}
-
-/**
- * Get the category slugs configured for this example.
- *
- * @return string[]
- */
-function get_template_category_slugs(): array {
-	return CATEGORY_SLUGS;
-}
-
-/**
- * Keep configured category slugs in their declared order.
- *
- * @param string[] $candidate_slugs Candidate category slugs.
- * @param string[] $configured_slugs Configured category slugs.
- * @return string[]
- */
-function filter_configured_category_slugs( array $candidate_slugs, array $configured_slugs ): array {
-	return array_values(
-		array_filter(
-			$configured_slugs,
-			static function ( string $configured_slug ) use ( $candidate_slugs ): bool {
-				return in_array( $configured_slug, $candidate_slugs, true );
-			}
-		)
-	);
 }
 
 /**
@@ -238,35 +215,5 @@ function get_product_category_ancestor_slugs( array $terms ): array {
  * @return string
  */
 function get_template_slug( string $category_slug ): string {
-	return TEMPLATE_SLUG_PREFIX . sanitize_title( $category_slug );
-}
-
-/**
- * Get the template title for a category slug.
- *
- * @param string $category_slug Product category slug.
- * @return string
- */
-function get_template_title( string $category_slug ): string {
-	return sprintf(
-		/* translators: %s: Product category name. */
-		__( 'Single Product: %s Category', 'woo-example-product-templates' ),
-		get_category_label( $category_slug )
-	);
-}
-
-/**
- * Get a readable category label from the site term when available.
- *
- * @param string $category_slug Product category slug.
- * @return string
- */
-function get_category_label( string $category_slug ): string {
-	$term = get_term_by( 'slug', $category_slug, 'product_cat' );
-
-	if ( $term instanceof \WP_Term ) {
-		return $term->name;
-	}
-
-	return ucwords( str_replace( '-', ' ', $category_slug ) );
+	return TEMPLATE_SLUG_PREFIX . $category_slug;
 }
